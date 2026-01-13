@@ -67,6 +67,54 @@ public class UsuarioService {
         return result;
     }
     
+    @Transactional
+    public Result Delete(int idUsuario){
+        Result result = new Result();
+        try {
+            usuarioJPARepository.deleteById(idUsuario);
+            result.Correct = true;
+        } catch (Exception ex) {
+            result.Correct = false;
+            result.ErrorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+    
+    @Transactional
+    public Result SoftDelete(Usuario usuario){
+        Result result = new Result();
+        try {
+            Optional<Usuario> user = usuarioJPARepository.findById(usuario.getIdUsuario());
+            user.get().setStatus(usuario.getStatus());
+            usuario = user.get();
+            usuarioJPARepository.save(usuario);
+            result.Correct = true;
+        } catch (Exception ex) {
+            result.Correct = false;
+            result.ErrorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+    
+    @Transactional
+    public Result getById(int idUsuario){
+        Result result = new Result();
+        try {
+            Optional<Usuario> usuario = usuarioJPARepository.findById(idUsuario);
+            result.Object = usuario.get();
+            result.Correct = true;
+        } catch (Exception ex) {
+            result.Correct = false;
+            result.ErrorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+    
+    
+    
 //    public int Suma(int NumeroUno, int NumeroDos){
 //        
 //        return NumeroUno + NumeroDos;
