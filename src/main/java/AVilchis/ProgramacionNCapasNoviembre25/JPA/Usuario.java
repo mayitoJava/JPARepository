@@ -33,7 +33,7 @@ public class Usuario {
 //    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date FechaNacimiento;
     @Column(name = "username")
-    private String Username;
+    private String username;
     @Column(name = "sexo")
     private String Sexo;
     @Column(name = "email")
@@ -101,11 +101,11 @@ public class Usuario {
     }
 
     public String getUsername() {
-        return Username;
+        return username;
     }
 
-    public void setUsername(String Username) {
-        this.Username = Username;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getSexo() {
