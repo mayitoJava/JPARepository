@@ -4,88 +4,136 @@
         <title>Usuarios</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+        <style>
+            .celda-bloqueada {
+                background-color: #f8d7da;
+                color: #721c24;
+            }
+            .acciones-deshabilitadas button {
+                pointer-events: none;
+                opacity: 0.5;
+            }
+        </style>
     </head>
-    <body class="container mt-4">
-        <div>
+    <body class="bg-light">
 
-            <br/>
-            <br/>
+        <div class="container py-4">
 
-            <form th:action="@{/usuario/GetAllDinamico}" method="post" th:object="${usuarioBusqueda}">
-                <div class="row">
-                    <div class="col-8">
-                        <div class="col">
-                            <label for="NombreUsuario">Nombre</label>
-                            <input type="text" class="form-control" id="NombreUsuario" placeholder="Nombre" th:field="*{Nombre}">
-                        </div>
-                        <div class="col">
-                            <label for="ApellidoPaterno">Apellido Paterno</label>
-                            <input type="text" class="form-control" id="ApellidoPaterno" placeholder="Apellido Paterno" th:field="*{ApellidoPaterno}">
-                        </div>
-                        <div class="col">
-                            <label for="ApellidoMaterno">Apellido Materno</label>
-                            <input type="text" class="form-control" id="ApellidoMaterno" placeholder="Apellido Materno" th:field="*{ApellidoMaterno}">
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <label for="RolUsuario" class="form-label">Rol</label>
-                        <select class="form-select" id="RolUsuario" th:field="*{rol.IdRol}">
-                            <option value="0">Selecciona un rol</option>
-                            <option th:each="rol : ${rol}" th:text="${rol.Nombre}" th:value="${rol.IdRol}"></option>
-                        </select>
-                    </div>
+            <!-- Búsqueda de Usuarios -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-success text-white fw-bold">
+                    Buscar Usuarios
                 </div>
-                <button type="submit" class="btn btn-success mt-4 w-100 fw-bold">Buscar</button>
-            </form>
+                <div class="card-body">
+                    <form th:action="@{/usuario/GetAllDinamico}" method="post" th:object="${usuarioBusqueda}">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="NombreUsuario" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="NombreUsuario" placeholder="Nombre" th:field="*{Nombre}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="ApellidoPaterno" class="form-label">Apellido Paterno</label>
+                                <input type="text" class="form-control" id="ApellidoPaterno" placeholder="Apellido Paterno" th:field="*{ApellidoPaterno}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="ApellidoMaterno" class="form-label">Apellido Materno</label>
+                                <input type="text" class="form-control" id="ApellidoMaterno" placeholder="Apellido Materno" th:field="*{ApellidoMaterno}">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label for="RolUsuario" class="form-label">Rol</label>
+                                <select class="form-select" id="RolUsuario" th:field="*{rol.IdRol}">
+                                    <option value="0">Selecciona un rol</option>
+                                    <option th:each="rol : ${rol}" th:text="${rol.Nombre}" th:value="${rol.IdRol}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-success w-100 fw-bold">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-            <br/>
-            <a th:href="@{/usuario/form}" class="btn btn-success mb-3 w-100">Agregar Nuevo Usuario</a>
-            <div class="table-responsive">
-                <table class="table table-hover table-striped">
-                    <thead>
-                        <tr class="table-warning">
-                            <th>Nombre</th>
+            <!-- Botón Agregar Usuario -->
+            <div class="mb-3">
+                <a th:href="@{/usuario/form}" class="btn btn-success w-100 fw-bold"><i class="bi bi-plus-circle"></i> Agregar Nuevo Usuario</a>
+            </div>
+
+            <!-- Tabla de Usuarios -->
+            <div class="table-responsive shadow-sm">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-success text-center">
+                        <tr>
+                            <th>Acciones</th>
+                            <th>Nombre Completo</th>
                             <th>Información</th>
                             <th>Direcciones</th>
-                            <th>Acción</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="usuario : ${usuarios}">
-                            <td class="table-info" th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|"></td>
+                        <tr th:each="usuario : ${usuarios}" th:classappend="${usuario.status == 0} ? 'table-danger' : ''">
+
+                            <!-- Acciones -->
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <!-- Botón Eliminar: bloqueado si usuario desactivado -->
+                                    <button th:onclick="|EliminarUsuario(${usuario.IdUsuario})|"
+                                            class="btn btn-danger btn-sm"
+                                            th:disabled="${usuario.status == 0}">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+
+                                    <!-- Botón Editar: bloqueado si usuario desactivado -->
+                                    <a th:href="@{usuario/detail/{IdUsuario} (IdUsuario = ${usuario.IdUsuario})}"
+                                       class="btn btn-warning btn-sm"
+                                       th:classappend="${usuario.status == 0} ? 'disabled' : ''"
+                                       th:attr="aria-disabled=${usuario.status == 0}">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                            <!-- Nombre Completo -->
+                            <td th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|" class="fw-bold"></td>
+
+                            <!-- Información -->
                             <td>
-                                <strong>Username:</strong> <span th:text="${usuario.Username}"></span><br/>
-                                <strong>Email:</strong> <span th:text="${usuario.Email}"></span><br/>
-                                <strong>Sexo:</strong> <span th:text="${usuario.Sexo}"></span><br/>
-                                <strong>Fecha Nac.:</strong> <span th:text="${usuario.FechaNacimiento}"></span><br/>
-                                <strong>Teléfono:</strong> <span th:text="${usuario.Telefono}"></span><br/>
-                                <strong>Celular:</strong> <span th:text="${usuario.Celular}"></span><br/>
-                                <strong>CURP:</strong> <span th:text="${usuario.Curp}"></span><br/>
+                                <ul class="mb-0">
+                                    <li th:text="${usuario.Telefono}"></li>
+                                    <li th:text="${usuario.FechaNacimiento}"></li>
+                                    <li th:text="${usuario.Username}"></li>
+                                    <li th:text="${usuario.Email}"></li>
+                                    <li th:text="${usuario.Sexo}"></li>
+                                    <li th:text="${usuario.Celular}"></li>
+                                    <li th:text="${usuario.Curp}"></li>
+                                    <li th:text="${usuario.status}"></li>
+                                </ul>
                             </td>
+
+                            <!-- Direcciones -->
                             <td>
-                                <ul th:if="${usuario.Direcciones != null}">
-                                    <li th:each="direccion: ${usuario.Direcciones}" th:text="|${direccion.Calle} ${direccion.NumeroExterior} ${direccion.NumeroInterior}|">Direccion</li>              
-                                </ul>
-                                <ul th:unless="${usuario.Direcciones != null}">
-                                    <li>Sin direccion.</li>
+                                <ul class="mb-0" th:if="${usuario.Direcciones != null}">
+                                    <li th:each="direccion : ${usuario.Direcciones}" th:text="${direccion.Calle}"></li>
                                 </ul>
                             </td>
-                            <td class="table-info">
-                                <a th:href="@{/usuario/detail/{IdUsuario} (IdUsuario = ${usuario.IdUsuario})}" class="btn btn-light btn-sm mb-1">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <a class="btn btn-danger btn-sm mb-1">
-                                    <i class="bi bi-trash3-fill"></i>
-                                </a>
-                            </td>
-                            <td class="table-info">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" value="" id="status" switch>
-                                    <label class="form-check-label" for="status"></label>
+
+                            <!-- Status Switch: SIEMPRE activo -->
+                            <td class="text-center">
+                                <div class="form-check form-switch d-flex justify-content-center">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           role="switch"
+                                           th:id="'switch' + ${usuario.IdUsuario}"
+                                           th:checked="${usuario.status == 1}"
+                                           th:onchange="|cambiarEstatus(this, ${usuario.IdUsuario})|">
                                 </div>
                             </td>
                         </tr>
@@ -94,6 +142,73 @@
             </div>
 
         </div>
+
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            function cambiarEstatus(checkbox, IdUsuario) {
+                const nuevostatus = checkbox.checked ? 1 : 0;
+                const usuarioData = {estatus: nuevostatus};
+
+                Swal.fire({
+                    title: "¿Estás seguro de cambiar el estatus del usuario?",
+                    text: "Se va a cambiar el usuario",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Sí, cambiar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`http://localhost:8080/api/usuario/status/${IdUsuario}/${nuevostatus}`, {
+                            method: 'PUT',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify(usuarioData)
+                        })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.Correct) {
+                                        Swal.fire("¡Modificado!", "El usuario se modificó correctamente", "success")
+                                                .then(() => location.reload());
+                                    } else {
+                                        Swal.fire("Error", data.ErrorMessage, "error");
+                                    }
+                                })
+                                .catch(() => Swal.fire("Error", "Ocurrió un fallo en la conexión", "error"));
+                    } else {
+                        checkbox.checked = !checkbox.checked;
+                    }
+                });
+            }
+
+            function EliminarUsuario(IdUsuario) {
+                Swal.fire({
+                    title: "¿Estás seguro de eliminar el usuario?",
+                    text: "El usuario se va a eliminar",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Sí, borrar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`http://localhost:8080/api/usuario/${IdUsuario}`, {method: 'DELETE'})
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.Correct) {
+                                        Swal.fire("¡Borrado!", "El usuario se eliminó correctamente", "success")
+                                                .then(() => location.reload());
+                                    } else {
+                                        Swal.fire("Error", data.ErrorMessage, "error");
+                                    }
+                                })
+                                .catch(() => Swal.fire("Error", "Ocurrió un fallo en la conexión", "error"));
+                    }
+                });
+            }
+        </script>
 
     </body>
 </html>

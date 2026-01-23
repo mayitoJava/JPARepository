@@ -1,6 +1,7 @@
 package AVilchis.ProgramacionNCapasNoviembre25.Controller;
 
 import AVilchis.ProgramacionNCapasNoviembre25.JPA.Direccion;
+import AVilchis.ProgramacionNCapasNoviembre25.JPA.Rol;
 import AVilchis.ProgramacionNCapasNoviembre25.JPA.Usuario;
 import AVilchis.ProgramacionNCapasNoviembre25.Service.ColoniaService;
 import AVilchis.ProgramacionNCapasNoviembre25.Service.DireccionService;
@@ -19,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -55,7 +57,9 @@ public class UsuarioController {
     public String GetAll(Model model) {
         AVilchis.ProgramacionNCapasNoviembre25.JPA.Result result = usuarioService.GetAll();
         model.addAttribute("usuarios", result.Object);
-        model.addAttribute("usuarioBusqueda", new Usuario());
+        Usuario usuarioBusqueda = new Usuario();
+        usuarioBusqueda.Rol = new Rol();
+        model.addAttribute("usuarioBusqueda", usuarioBusqueda);
         AVilchis.ProgramacionNCapasNoviembre25.JPA.Result resultRoles = rolService.GetAll();
         model.addAttribute("rol", resultRoles.Object);
         return "UsuarioIndex";
@@ -141,4 +145,28 @@ public class UsuarioController {
 
         return "redirect:/usuario";
     }
+    
+//    @GetMapping("delete/{IdUsuario}")
+//    public String Delete(@PathVariable("IdUsuario") int IdUsuario, RedirectAttributes redirectAttributes){
+//        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result resultDelete = usuarioService.Delete(IdUsuario);
+//        if (resultDelete.Correct){
+//            resultDelete.Object = 
+//        } else {
+//            
+//        }
+//    }
+    
+    @GetMapping("detail/{IdUsuario}")
+    public String Detail(@PathVariable("IdUsuario") int IdUsuario, Model model, RedirectAttributes redirectAttributes){
+        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result result = usuarioService.getById(IdUsuario);
+        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result resultRol = rolService.GetAll();
+        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result resultPais = paisService.getAll();
+        model.addAttribute("rol", resultRol.Object);
+        model.addAttribute("pais", resultPais.Object);
+        model.addAttribute("usuario", result.Object);
+        model.addAttribute("Direccion", new Direccion());
+        return "UsuarioEditar";
+    }
+    
+    
 }

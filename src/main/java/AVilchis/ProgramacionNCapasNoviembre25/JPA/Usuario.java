@@ -155,5 +155,23 @@ public class Usuario {
     public void setStatus(int status) {
         this.Status = status;
     }
+
+    public Rol getRol() {
+        return Rol;
+    }
+
+    public void setRol(Rol Rol) {
+        this.Rol = Rol;
+    }
+
+    public List<Direccion> getDirecciones() {
+        return Direcciones;
+    }
+
+    public void setDirecciones(List<Direccion> Direcciones) {
+        this.Direcciones = Direcciones;
+    }
+    
+    
     
 }

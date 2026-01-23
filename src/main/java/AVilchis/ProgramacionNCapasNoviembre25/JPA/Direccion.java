@@ -64,4 +64,21 @@ public class Direccion {
         this.NumeroExterior = NumeroExterior;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public Colonia getColonia() {
+        return Colonia;
+    }
+
+    public void setColonia(Colonia Colonia) {
+        this.Colonia = Colonia;
+    }
+
+    
 }
