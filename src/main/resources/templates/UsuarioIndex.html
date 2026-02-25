@@ -162,7 +162,7 @@
                     confirmButtonText: "Sí, cambiar"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`http://localhost:8080/api/usuario/status/${IdUsuario}/${nuevostatus}`, {
+                        fetch("/usuario/softDelete/" + IdUsuario + "/" + nuevostatus, {
                             method: 'PUT',
                             headers: {'Content-Type': 'application/json'},
                             body: JSON.stringify(usuarioData)
@@ -194,7 +194,7 @@
                     confirmButtonText: "Sí, borrar"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`http://localhost:8080/api/usuario/${IdUsuario}`, {method: 'DELETE'})
+                        fetch("/usuario/Delete/" + IdUsuario , {method: 'DELETE'})
                                 .then(res => res.json())
                                 .then(data => {
                                     if (data.Correct) {

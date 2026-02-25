@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller // sirve para mapear interacciones del usuario 
@@ -146,14 +147,36 @@ public class UsuarioController {
         return "redirect:/usuario";
     }
     
-//    @GetMapping("delete/{IdUsuario}")
-//    public String Delete(@PathVariable("IdUsuario") int IdUsuario, RedirectAttributes redirectAttributes){
-//        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result resultDelete = usuarioService.Delete(IdUsuario);
-//        if (resultDelete.Correct){
-//            resultDelete.Object = 
-//        } else {
-//            
-//        }
+    @GetMapping("delete/{IdUsuario}")
+    public String Delete(@PathVariable("IdUsuario") int IdUsuario, RedirectAttributes redirectAttributes){
+        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result resultDelete = usuarioService.Delete(IdUsuario);
+        if (resultDelete.Correct){
+            resultDelete.Object = "Fue eliminado: " + IdUsuario + "se elimino correctamente";
+        } else {
+            resultDelete.Object = "El usuario no se puede eliminar";
+        }
+        redirectAttributes.addFlashAttribute("resultDelete", resultDelete);
+        return "redirect:/usuario";
+    }
+    
+    @GetMapping("softDelete/{IdUsuario}/{status}")
+    @ResponseBody
+    public AVilchis.ProgramacionNCapasNoviembre25.JPA.Result SoftDelete(@PathVariable("IdUsuario") int IdUsuario, @PathVariable("status") int status, RedirectAttributes redirectAttributes){
+        Usuario usuario = new Usuario();
+        usuario.setIdUsuario(IdUsuario);
+        usuario.setStatus(status);
+        
+        ModelMapper modelMapper = new ModelMapper();
+        
+        AVilchis.ProgramacionNCapasNoviembre25.JPA.Usuario usuarioJPA = modelMapper.map(usuario, AVilchis.ProgramacionNCapasNoviembre25.JPA.Usuario.class);
+        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result resultSoft = usuarioService.SoftDelete(usuarioJPA);
+        
+        return resultSoft;
+    }   
+    
+//    @GetMapping("")
+//    public String DeleteDireccion(){
+//        return "UsuarioEditar";
 //    }
     
     @GetMapping("detail/{IdUsuario}")
@@ -168,5 +191,25 @@ public class UsuarioController {
         return "UsuarioEditar";
     }
     
+//    @GetMapping("getEstadoByPais/{IdPais")
+//    @ResponseBody
+//    public AVilchis.ProgramacionNCapasNoviembre25.JPA.Result getEstadoByPais(@PathVariable int IdPais){
+//        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result result = estadoService.getByPais(IdPais);
+//        return result;
+//    }
+//    
+//    @GetMapping("getMunicipioByEstado/{IdEstado}")
+//    @ResponseBody
+//    public AVilchis.ProgramacionNCapasNoviembre25.JPA.Result getMunicipioByEstado(@PathVariable("IdEstado") int IdEstado){
+//        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result result = municipioService.getByEstado(IdEstado);
+//        return result;
+//    }
+//    
+//    @GetMapping("getColoniaByMunicipio/{IdMunicipio}")
+//    @ResponseBody
+//    public AVilchis.ProgramacionNCapasNoviembre25.JPA.Result getColoniaByMunicipio(@PathVariable("IdColonia") int IdColonia){
+//        AVilchis.ProgramacionNCapasNoviembre25.JPA.Result result = coloniaService.getByMuncipio(IdColonia);
+//        return result;
+//    }
     
 }
